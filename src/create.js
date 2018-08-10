@@ -7,6 +7,7 @@ import i2b from "imageurl-base64";
 
 import { createGif } from "./giffer";
 
+import gm from "gm";
 const { HOST = "http://localhost:3002" } = process.env;
 
 const cleanUp = async images => {
@@ -37,8 +38,19 @@ const url2Buffer = url => {
   return new Promise((resolve, reject) => {
     i2b(url, (err, data) => {
       err && reject(err);
-      resolve(`data:image/jpg;base64,${data.base64}`);
+      resolve(`data:image/png;base64,${data.base64}`);
     });
+  });
+};
+
+const prepBrand = async brand => {
+  return new Promise((resolve, reject) => {
+    gm(brand)
+      .resize(600)
+      .write(brand, err => {
+        if (err) reject(err);
+        resolve(brand);
+      });
   });
 };
 
@@ -50,12 +62,13 @@ const createStory = async (storyImages, brand) => {
   }
 
   const brandBuffer = await url2Buffer(brand);
-  const brandLoc = await save(brandBuffer);
+  let brandLoc = await save(brandBuffer);
+  brandLoc = await prepBrand(brandLoc);
 
   imagePaths.push(brandLoc);
-  let gif = await createGif(imagePaths);
-  log({ imagePaths });
 
+  log({ imagePaths });
+  let gif = await createGif(imagePaths);
   log({ gif });
   await cleanUp(imagePaths);
 

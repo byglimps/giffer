@@ -2,13 +2,39 @@ import uuid from "uuid/v1";
 import { resolve as path_resolve } from "path";
 
 import gm from "gm";
+import Jimp from "jimp";
 
-const getDestInfo = id => {
-  const fileName = `c_${id}.gif`;
+const getDestInfo = () => {
+  const fileName = `c_${uuid()}.gif`;
   return {
     file_name: fileName,
     file_path: path_resolve(`tmp/${fileName}`)
   };
+};
+
+/**
+ * @param {string} path
+ */
+const getImageInfo = async path => {
+  const { bitmap } = await Jimp.read(path);
+  return bitmap;
+};
+
+/**
+ * @param {string} dest
+ * @param {string} brandPath
+ */
+const brandOverlay = async (dest, brandPath) => {
+  const { width, height } = await getImageInfo(brandPath);
+
+  return new Promise((resolve, reject) => {
+    gm(dest.file_path)
+      .draw([`image Over 350,50 ${width},${height} ${brandPath}`])
+      .write(dest.file_path, err => {
+        if (err) reject(err);
+        resolve();
+      });
+  });
 };
 
 /**
@@ -18,17 +44,19 @@ const getDestInfo = id => {
  */
 const createGif = async imagePaths => {
   return new Promise(resolve => {
-    const id = uuid();
+    const dest = getDestInfo();
+    const brand = imagePaths[3];
     gm()
       .in(imagePaths[0])
       .in(imagePaths[1])
       .in(imagePaths[2])
-      .in(imagePaths[3])
-      .delay(50)
-      .resize(640, 480)
-      .write(path_resolve(`tmp/c_${id}.gif`), err => {
+      .delay(40)
+      .resize(1280, 960)
+      .gravity("Center")
+      .write(dest.file_path, async err => {
         if (err) throw err;
-        const dest = getDestInfo(id);
+        await brandOverlay(dest, brand);
+
         resolve(dest);
       });
   });
