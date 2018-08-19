@@ -65,12 +65,10 @@ const createStory = async (storyImages, brand) => {
   let brandLoc = await save(brandBuffer);
   brandLoc = await prepBrand(brandLoc);
 
-  imagePaths.push(brandLoc);
-
   log({ imagePaths });
-  let gif = await createGif(imagePaths);
+  let gif = await createGif(imagePaths, brandPath);
   log({ gif });
-  await cleanUp(imagePaths);
+  await cleanUp(imagePaths, brandPath);
 
   return gif;
 };

@@ -42,21 +42,21 @@ const brandOverlay = async (dest, brandPath) => {
  * @param {Array<string>} files
  * @returns {Promise<{file_name: string, file_path: string}>}
  */
-const createGif = async imagePaths => {
+const createGif = async (imagePaths, brandPath) => {
   return new Promise(resolve => {
     const dest = getDestInfo();
-    const brand = imagePaths[3];
-    gm()
-      .in(imagePaths[0])
-      .in(imagePaths[1])
-      .in(imagePaths[2])
+
+    let gmi = gm();
+
+    images.map(img => img && gmi.in(img));
+
+    gmi
       .delay(40)
       .resize(1280, 960)
       .gravity("Center")
       .write(dest.file_path, async err => {
         if (err) throw err;
-        await brandOverlay(dest, brand);
-
+        await brandOverlay(dest, brandPath);
         resolve(dest);
       });
   });
