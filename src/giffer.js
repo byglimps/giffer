@@ -48,7 +48,7 @@ const createGif = async (imagePaths, brandPath) => {
 
     let gmi = gm();
 
-    images.map(img => img && gmi.in(img));
+    imagePaths.map(img => img && gmi.in(img));
 
     gmi
       .delay(40)

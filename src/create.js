@@ -60,16 +60,18 @@ const createStory = async (storyImages, brand) => {
     let loc = await save(shot.base64);
     imagePaths = imagePaths.concat([loc]);
   }
-
   const brandBuffer = await url2Buffer(brand);
   let brandLoc = await save(brandBuffer);
   brandLoc = await prepBrand(brandLoc);
 
   log({ imagePaths });
-  let gif = await createGif(imagePaths, brandPath);
-  log({ gif });
-  await cleanUp(imagePaths, brandPath);
 
+  let gif = await createGif(imagePaths, brandLoc);
+
+  log({ gif });
+
+  await cleanUp(imagePaths);
+  await cleanUp(brandLoc);
   return gif;
 };
 
@@ -102,10 +104,10 @@ const makeDevUrl = filePath => {
 
 const create = async (req, res) => {
   try {
-    const { story: storyImages, brandImage, eventName } = req.body;
-    await validateReq(storyImages, brandImage, eventName);
+    const { data, brandImage, eventName } = req.body;
+    await validateReq(data, brandImage, eventName);
 
-    let story = await createStory(storyImages, brandImage);
+    let story = await createStory(data, brandImage);
 
     return res
       .status(200)
