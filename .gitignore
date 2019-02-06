@@ -1,0 +1,15 @@
+.DS_Store
+node_modules
+build
+npm-debug.log
+logs
+tmp
+.env
+package-lock.json
+yarn.lock
+yarn-error.log
+*.sqlite
+coverage
+.vs
+.vscode
+.idea
